@@ -54,14 +54,19 @@ def check_responses(df, text_field, latentSpace, yourConcept, POS_JAR=None, POS_
     tfidf = tfidf_vec.fit_transform(df['processed_text'])
     vocab = tfidf_vec.get_feature_names()
     
-    tfidf = tfidf[:-NB_REPLICATE]
-    df = df[:-NB_REPLICATE].reset_index().drop('index', 1)
-
-    nbResponse, nbTerm = tfidf.shape
-    print('There are {r} responses in {t} significant terms'.format(r=nbResponse,t=nbTerm))
+    #tfidf = tfidf[:-NB_REPLICATE]
+    
+    
     
     "apply SVD to TFIDF matrix"
     U, S, V_T = svds(tfidf, k=latentSpace)
+    U = U[:-NB_REPLICATE,:]
+
+    nbResponse, _ = U.shape
+    _, nbTerm     = V_T.shape
+    print('There are {r} responses in {t} significant terms'.format(r=nbResponse,t=nbTerm))
+
+    df = df[:-NB_REPLICATE].reset_index().drop('index', 1)
     
     "Preprocessed yourConcept"
     tokenizer = RegexpTokenizer(r'\w+')
